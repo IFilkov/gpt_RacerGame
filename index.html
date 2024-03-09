@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Racing Game</title>
+    <style>
+      canvas {
+        border: 1px solid black;
+        display: block;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <script>
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+
+      // Инициализация координат героя
+      let heroX = canvas.width / 2;
+      let heroY = canvas.height - 50;
+      const heroWidth = 50;
+      const heroHeight = 50;
+      const heroSpeed = 5;
+
+      // Функция отрисовки героя
+      function drawHero() {
+        ctx.fillStyle = "orange";
+        ctx.fillRect(heroX, heroY, heroWidth, heroHeight);
+      }
+
+      // Функция обновления игрового экрана
+      function update() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawHero();
+      }
+
+      // Обработчик нажатия клавиш
+      window.addEventListener("keydown", function (e) {
+        switch (e.key) {
+          case "ArrowLeft":
+            if (heroX - heroSpeed >= 0) {
+              heroX -= heroSpeed;
+            }
+            break;
+          case "ArrowRight":
+            if (heroX + heroWidth + heroSpeed <= canvas.width) {
+              heroX += heroSpeed;
+            }
+            break;
+          case "ArrowUp":
+            if (heroY - heroSpeed >= 0) {
+              heroY -= heroSpeed;
+            }
+            break;
+          case "ArrowDown":
+            if (heroY + heroHeight + heroSpeed <= canvas.height) {
+              heroY += heroSpeed;
+            }
+            break;
+          case " ":
+            // Действие при нажатии пробела (ускорение или замедление)
+            // В этом примере можно добавить логику для ускорения/замедления
+            break;
+        }
+        update();
+      });
+
+      // Инициализация игры
+      function init() {
+        update();
+      }
+
+      // Запуск игры
+      init();
+    </script>
+  </body>
+</html>
