@@ -5,18 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Racing Game</title>
     <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
       canvas {
         border: 1px solid black;
         display: block;
         margin: 0 auto;
+        width: calc(80vh); /* Выберите нужную ширину */
+        height: 100vh;
       }
     </style>
   </head>
   <body>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <canvas id="gameCanvas"></canvas>
     <script>
       const canvas = document.getElementById("gameCanvas");
       const ctx = canvas.getContext("2d");
+
+      // Определение ширины и высоты canvas
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
 
       // Инициализация координат героя
       let heroX = canvas.width / 2;
