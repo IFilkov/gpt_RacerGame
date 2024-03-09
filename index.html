@@ -38,53 +38,68 @@
       const heroSpeed = 5;
 
       // Массив для хранения прямоугольников
-      const rectangles = [];
+      let rectangles = [];
 
-      // Функция создания случайного числа в заданном диапазоне
-      function getRandomNumber(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+      // Функция создания прямоугольника
+      function createRectangle() {
+        const rectangleX = Math.random() * (canvas.width - heroWidth);
+        const rectangleY = 0;
+        const rectangleWidth = heroWidth;
+        const rectangleHeight =
+          Math.random() * (3 * heroHeight - heroHeight) + heroHeight; // случайная высота от heroHeight до 3 * heroHeight
+        const rectangleColor =
+          "#" + Math.floor(Math.random() * 16777215).toString(16); // случайный цвет
+        return {
+          x: rectangleX,
+          y: rectangleY,
+          width: rectangleWidth,
+          height: rectangleHeight,
+          color: rectangleColor,
+        };
       }
 
-      // Функция отрисовки прямоугольников
-      function drawRectangles() {
-        for (let i = 0; i < rectangles.length; i++) {
-          const rect = rectangles[i];
-          ctx.fillStyle = rect.color;
-          ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
-        }
-      }
-
-      // Функция обновления прямоугольников (их положения)
-      function updateRectangles() {
-        for (let i = 0; i < rectangles.length; i++) {
-          rectangles[i].y += heroSpeed / 2; // Движение прямоугольников с разной скоростью
-          if (rectangles[i].y > canvas.height) {
-            // Если прямоугольник вышел за пределы canvas, удаляем его
-            rectangles.splice(i, 1);
-          }
-        }
-      }
-
-      // Функция добавления нового прямоугольника
-      function addRectangle() {
-        const x = getRandomNumber(0, canvas.width - heroWidth);
-        const width = getRandomNumber(heroWidth, heroWidth * 3);
-        const color = "#" + Math.floor(Math.random() * 16777215).toString(16); // Генерация случайного цвета
-        rectangles.push({ x: x, y: 0, width: width, height: 20, color: color });
+      // Функция отрисовки прямоугольника
+      function drawRectangle(rectangle) {
+        ctx.fillStyle = rectangle.color;
+        ctx.fillRect(
+          rectangle.x,
+          rectangle.y,
+          rectangle.width,
+          rectangle.height
+        );
       }
 
       // Функция обновления игрового экрана
       function update() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        rectangles.forEach((rectangle) => {
+          drawRectangle(rectangle);
+          rectangle.y += heroSpeed; // движение прямоугольника вниз
+        });
         drawHero();
-        drawRectangles();
-        updateRectangles();
+        checkCollision(); // Проверка на столкновение героя с прямоугольниками
+        requestAnimationFrame(update);
       }
 
       // Функция отрисовки героя
       function drawHero() {
         ctx.fillStyle = "orange";
         ctx.fillRect(heroX, heroY, heroWidth, heroHeight);
+      }
+
+      // Функция проверки на столкновение героя с прямоугольниками
+      function checkCollision() {
+        rectangles.forEach((rectangle) => {
+          if (
+            heroX < rectangle.x + rectangle.width &&
+            heroX + heroWidth > rectangle.x &&
+            heroY < rectangle.y + rectangle.height &&
+            heroY + heroHeight > rectangle.y
+          ) {
+            alert("Game Over!");
+            location.reload(); // Перезагрузка страницы при столкновении
+          }
+        });
       }
 
       // Обработчик нажатия клавиш
@@ -115,13 +130,18 @@
             // В этом примере можно добавить логику для ускорения/замедления
             break;
         }
-        update();
       });
+
+      // Функция создания и добавления нового прямоугольника в массив
+      function addRectangle() {
+        rectangles.push(createRectangle());
+      }
 
       // Инициализация игры
       function init() {
-        setInterval(addRectangle, 1000); // Добавление новых прямоугольников каждую секунду
-        setInterval(update, 20); // Обновление экрана каждые 20 миллисекунд
+        addRectangle(); // Добавляем первый прямоугольник
+        setInterval(addRectangle, 2000); // Добавляем новый прямоугольник каждые 2 секунды
+        update(); // Запускаем обновление экрана
       }
 
       // Запуск игры
