@@ -30,33 +30,37 @@
       canvas.width = canvas.clientWidth;
       canvas.height = canvas.clientHeight;
 
-      // Инициализация координат героя
+      // Инициализация координат героя и его скорости
       let heroX = canvas.width / 2;
       let heroY = canvas.height - 50;
       const heroWidth = 50;
       const heroHeight = 50;
-      const heroSpeed = 5;
+      let heroSpeed = 5; // Изначальная скорость героя
+      const maxHeroSpeed = 20; // Максимальная скорость героя
 
       // Массив для хранения прямоугольников
       let rectangles = [];
 
       // Функция создания прямоугольника
       function createRectangle() {
-        const rectangleX = Math.random() * (canvas.width - heroWidth);
+        const rectangleX =
+          Math.random() > 0.5
+            ? Math.random() * (canvas.width - heroWidth)
+            : (Math.random() * canvas.width) / 2;
         const rectangleY = 0;
         const rectangleWidth = heroWidth;
         const rectangleHeight =
           Math.random() * (3 * heroHeight - heroHeight) + heroHeight; // случайная высота от heroHeight до 3 * heroHeight
+        const rectangleSpeed = Math.random() * 10 + 1; // случайная скорость от 1 до 10
         const rectangleColor =
           "#" + Math.floor(Math.random() * 16777215).toString(16); // случайный цвет
-        const rectangleSpeed = Math.random() * 12 + 1; // случайная скорость от 1 до 3
         return {
           x: rectangleX,
           y: rectangleY,
           width: rectangleWidth,
           height: rectangleHeight,
-          color: rectangleColor,
           speed: rectangleSpeed,
+          color: rectangleColor,
         };
       }
 
@@ -128,8 +132,10 @@
             }
             break;
           case " ":
-            // Действие при нажатии пробела (ускорение или замедление)
-            // В этом примере можно добавить логику для ускорения/замедления
+            // Увеличиваем скорость героя
+            if (heroSpeed < maxHeroSpeed) {
+              heroSpeed += 1;
+            }
             break;
         }
       });
