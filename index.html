@@ -123,7 +123,7 @@
         if (isGameOver) return; // Если игра завершена, останавливаем обновление
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        rectangles.forEach((rectangle) => {
+        rectangles.forEach((rectangle, index) => {
           drawRectangle(rectangle);
           rectangle.y += rectangle.speed; // движение прямоугольника вниз
 
@@ -135,6 +135,40 @@
             heroY + heroHeight > rectangle.y
           ) {
             gameOver();
+          }
+
+          // Проверка на столкновение с другими прямоугольниками
+          if (index > 0) {
+            for (let i = index - 1; i >= 0; i--) {
+              if (
+                rectangle.x < rectangles[i].x + rectangles[i].width &&
+                rectangle.x + rectangle.width > rectangles[i].x &&
+                rectangle.y < rectangles[i].y + rectangles[i].height &&
+                rectangle.y + rectangle.height > rectangles[i].y
+              ) {
+                // Отталкиваем прямоугольники в случайном направлении
+                let directionX = Math.random() > 0.5 ? 1 : -1;
+                let directionY = Math.random() > 0.5 ? 1 : -1;
+                rectangle.x += directionX * rectangle.speed;
+                rectangle.y += directionY * rectangle.speed;
+
+                // Проверяем, вышел ли прямоугольник за пределы canvas
+                if (
+                  rectangle.x < 0 ||
+                  rectangle.x + rectangle.width > canvas.width
+                ) {
+                  rectangles.splice(index, 1); // Удаляем прямоугольник
+                }
+
+                // Проверяем, вышел ли прямоугольник за пределы canvas
+                if (
+                  rectangle.y < 0 ||
+                  rectangle.y + rectangle.height > canvas.height
+                ) {
+                  rectangles.splice(index, 1); // Удаляем прямоугольник
+                }
+              }
+            }
           }
         });
         drawHero();
