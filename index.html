@@ -18,10 +18,34 @@
         width: calc(80vh); /* Выберите нужную ширину */
         height: 100vh;
       }
+      #gameOverMessage {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 32px;
+        color: red;
+      }
+      #restartButton {
+        display: block;
+        margin-top: 20px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 10px 20px;
+        font-size: 18px;
+        background-color: green;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
     <canvas id="gameCanvas"></canvas>
+    <div id="gameOverMessage" style="display: none">
+      <h1>Game Over</h1>
+      <button id="restartButton">Restart</button>
+    </div>
     <script>
       const canvas = document.getElementById("gameCanvas");
       const ctx = canvas.getContext("2d");
@@ -41,16 +65,35 @@
       // Массив для хранения прямоугольников
       let rectangles = [];
 
+      // Переменная для хранения статуса игры
+      let isGameOver = false;
+
       // Функция создания прямоугольника
       function createRectangle() {
-        const rectangleX =
-          Math.random() > 0.5
-            ? Math.random() * (canvas.width - heroWidth)
-            : (Math.random() * canvas.width) / 2;
-        const rectangleY = 0;
-        const rectangleWidth = heroWidth;
-        const rectangleHeight =
-          Math.random() * (3 * heroHeight - heroHeight) + heroHeight; // случайная высота от heroHeight до 3 * heroHeight
+        let isOverlap = false;
+        let rectangleX, rectangleY, rectangleWidth, rectangleHeight;
+
+        do {
+          rectangleX =
+            Math.random() > 0.5
+              ? Math.random() * (canvas.width - heroWidth)
+              : (Math.random() * canvas.width) / 2;
+          rectangleY = 0;
+          rectangleWidth = heroWidth;
+          rectangleHeight =
+            Math.random() * (3 * heroHeight - heroHeight) + heroHeight; // случайная высота от heroHeight до 3 * heroHeight
+
+          // Проверяем на пересечение с другими прямоугольниками
+          isOverlap = rectangles.some((rectangle) => {
+            return (
+              rectangleX < rectangle.x + rectangle.width &&
+              rectangleX + rectangleWidth > rectangle.x &&
+              rectangleY < rectangle.y + rectangle.height &&
+              rectangleY + rectangleHeight > rectangle.y
+            );
+          });
+        } while (isOverlap);
+
         const rectangleSpeed = Math.random() * 10 + 1; // случайная скорость от 1 до 10
         const rectangleColor =
           "#" + Math.floor(Math.random() * 16777215).toString(16); // случайный цвет
@@ -81,10 +124,21 @@
         rectangles.forEach((rectangle) => {
           drawRectangle(rectangle);
           rectangle.y += rectangle.speed; // движение прямоугольника вниз
+
+          // Проверка на столкновение с героем
+          if (
+            heroX < rectangle.x + rectangle.width &&
+            heroX + heroWidth > rectangle.x &&
+            heroY < rectangle.y + rectangle.height &&
+            heroY + heroHeight > rectangle.y
+          ) {
+            gameOver();
+          }
         });
         drawHero();
-        checkCollision(); // Проверка на столкновение героя с прямоугольниками
-        requestAnimationFrame(update);
+        if (!isGameOver) {
+          requestAnimationFrame(update);
+        }
       }
 
       // Функция отрисовки героя
@@ -93,19 +147,18 @@
         ctx.fillRect(heroX, heroY, heroWidth, heroHeight);
       }
 
-      // Функция проверки на столкновение героя с прямоугольниками
-      function checkCollision() {
-        rectangles.forEach((rectangle) => {
-          if (
-            heroX < rectangle.x + rectangle.width &&
-            heroX + heroWidth > rectangle.x &&
-            heroY < rectangle.y + rectangle.height &&
-            heroY + heroHeight > rectangle.y
-          ) {
-            alert("Game Over!");
-            location.reload(); // Перезагрузка страницы при столкновении
-          }
-        });
+      // Функция завершения игры
+      function gameOver() {
+        isGameOver = true;
+        document.getElementById("gameOverMessage").style.display = "block";
+        document
+          .getElementById("restartButton")
+          .addEventListener("click", restartGame);
+      }
+
+      // Функция перезапуска игры
+      function restartGame() {
+        location.reload();
       }
 
       // Обработчик нажатия клавиш
