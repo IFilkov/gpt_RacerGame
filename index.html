@@ -58,9 +58,9 @@
       let heroX = canvas.width / 2;
       let heroY = canvas.height - 50;
       const heroWidth = 50;
-      const heroHeight = 50;
-      let heroSpeed = 5; // Изначальная скорость героя
-      const maxHeroSpeed = 20; // Максимальная скорость героя
+      const heroHeight = 70;
+      let heroSpeed = 20; // Изначальная скорость героя
+      const maxHeroSpeed = 40; // Максимальная скорость героя
 
       // Массив для хранения прямоугольников
       let rectangles = [];
@@ -120,6 +120,8 @@
 
       // Функция обновления игрового экрана
       function update() {
+        if (isGameOver) return; // Если игра завершена, останавливаем обновление
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         rectangles.forEach((rectangle) => {
           drawRectangle(rectangle);
@@ -136,9 +138,7 @@
           }
         });
         drawHero();
-        if (!isGameOver) {
-          requestAnimationFrame(update);
-        }
+        requestAnimationFrame(update);
       }
 
       // Функция отрисовки героя
@@ -151,14 +151,20 @@
       function gameOver() {
         isGameOver = true;
         document.getElementById("gameOverMessage").style.display = "block";
-        document
-          .getElementById("restartButton")
-          .addEventListener("click", restartGame);
+        document.getElementById("restartButton").style.display = "block";
       }
 
       // Функция перезапуска игры
       function restartGame() {
-        location.reload();
+        isGameOver = false;
+        heroX = canvas.width / 2;
+        heroY = canvas.height - 50;
+        rectangles = [];
+        document.getElementById("gameOverMessage").style.display = "none";
+        document.getElementById("restartButton").style.display = "none";
+        addRectangle(); // Добавляем первый прямоугольник
+        setTimeout(addRectangle, 2000); // Запускаем добавление новых прямоугольников через 2 секунды
+        update(); // Запускаем обновление экрана
       }
 
       // Обработчик нажатия клавиш
@@ -193,20 +199,23 @@
         }
       });
 
-      // Функция создания и добавления нового прямоугольника в массив
+      // Функция добавления нового прямоугольника
       function addRectangle() {
-        rectangles.push(createRectangle());
+        if (!isGameOver) {
+          rectangles.push(createRectangle());
+          setTimeout(addRectangle, 2000); // Запускаем добавление новых прямоугольников через 2 секунды
+        }
       }
 
-      // Инициализация игры
-      function init() {
-        addRectangle(); // Добавляем первый прямоугольник
-        setInterval(addRectangle, 2000); // Добавляем новый прямоугольник каждые 2 секунды
-        update(); // Запускаем обновление экрана
-      }
+      // Обработчик клика на кнопке "Restart"
+      document
+        .getElementById("restartButton")
+        .addEventListener("click", restartGame);
 
       // Запуск игры
-      init();
+      addRectangle(); // Добавляем первый прямоугольник
+      setTimeout(addRectangle, 2000); // Запускаем добавление новых прямоугольников через 2 секунды
+      update(); // Запускаем обновление экрана
     </script>
   </body>
 </html>
