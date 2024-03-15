@@ -61,6 +61,8 @@
       const heroHeight = 70;
       let heroSpeed = 20; // Изначальная скорость героя
       const maxHeroSpeed = 40; // Максимальная скорость героя
+      let heroStrength = 4;
+      let collisionCount = 0; // Счетчик столкновений
 
       // Массив для хранения прямоугольников
       let rectangles = [];
@@ -134,7 +136,22 @@
             heroY < rectangle.y + rectangle.height &&
             heroY + heroHeight > rectangle.y
           ) {
-            gameOver();
+            // Увеличиваем счетчик столкновений
+            collisionCount++;
+
+            // Проверяем, достигло ли количество столкновений 4
+            if (collisionCount === 4) {
+              // Уменьшаем прочность героя
+              heroStrength--;
+
+              // Сбрасываем счетчик столкновений
+              collisionCount = 0;
+
+              // Проверяем, закончилась ли игра
+              if (heroStrength === 0) {
+                gameOver();
+              }
+            }
           }
 
           // Проверка на столкновение с другими прямоугольниками
@@ -172,7 +189,14 @@
           }
         });
         drawHero();
+        drawHeroStrength(); // Добавляем отрисовку прочности героя
         requestAnimationFrame(update);
+      }
+
+      function drawHeroStrength() {
+        ctx.fillStyle = "red";
+        ctx.font = "24px Arial";
+        ctx.fillText(heroStrength, canvas.width - 50, canvas.height - 50);
       }
 
       // Функция отрисовки героя
@@ -194,6 +218,8 @@
         heroX = canvas.width / 2;
         heroY = canvas.height - 50;
         rectangles = [];
+        heroStrength = 4; // Восстанавливаем прочность героя
+        collisionCount = 0; // Сбрасываем счетчик столкновений
         document.getElementById("gameOverMessage").style.display = "none";
         document.getElementById("restartButton").style.display = "none";
         addRectangle(); // Добавляем первый прямоугольник
