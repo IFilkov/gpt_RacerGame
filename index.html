@@ -61,7 +61,7 @@
       const heroHeight = 70;
       let heroSpeed = 20; // Изначальная скорость героя
       const maxHeroSpeed = 40; // Максимальная скорость героя
-      let heroStrength = 4;
+      let heroStrength = 10;
       let collisionCount = 0; // Счетчик столкновений
 
       // Массив для хранения прямоугольников
@@ -136,21 +136,22 @@
             heroY < rectangle.y + rectangle.height &&
             heroY + heroHeight > rectangle.y
           ) {
-            // Увеличиваем счетчик столкновений
+            // Отталкиваем героя от прямоугольника в случайном направлении
+            let directionX = Math.random() > 0.5 ? 1 : -1;
+            let directionY = Math.random() > 0.5 ? 1 : -1;
+            heroX += directionX * heroSpeed;
+            heroY += directionY * heroSpeed;
+
+            // Уменьшаем прочность героя
             collisionCount++;
-
-            // Проверяем, достигло ли количество столкновений 4
-            if (collisionCount === 4) {
-              // Уменьшаем прочность героя
+            if (collisionCount === 10) {
               heroStrength--;
+              collisionCount = 0; // Сбрасываем счетчик столкновений
+            }
 
-              // Сбрасываем счетчик столкновений
-              collisionCount = 0;
-
-              // Проверяем, закончилась ли игра
-              if (heroStrength === 0) {
-                gameOver();
-              }
+            // Проверяем, закончилась ли игра
+            if (heroStrength === 0) {
+              gameOver();
             }
           }
 
@@ -194,7 +195,7 @@
       }
 
       function drawHeroStrength() {
-        ctx.fillStyle = "red";
+        ctx.fillStyle = "black";
         ctx.font = "24px Arial";
         ctx.fillText(heroStrength, canvas.width - 50, canvas.height - 50);
       }
@@ -218,7 +219,7 @@
         heroX = canvas.width / 2;
         heroY = canvas.height - 50;
         rectangles = [];
-        heroStrength = 4; // Восстанавливаем прочность героя
+        heroStrength = 10; // Восстанавливаем прочность героя
         collisionCount = 0; // Сбрасываем счетчик столкновений
         document.getElementById("gameOverMessage").style.display = "none";
         document.getElementById("restartButton").style.display = "none";
